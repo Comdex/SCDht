@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="{{.CurrentLang}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{i18n .Lang "title.listbefore"}} {{.Key}} {{i18n .Lang "title.listafter"}} - {{i18n .Lang "global.title"}}</title>
+    <meta name="keywords" content="{{.Key}},{{.Key}} {{i18n .Lang "keywords.listtorrent"}},{{.Key}} {{i18n .Lang "keywords.listmagnet"}}">
+    <meta name="description" content="{{.Key}} {{i18n .Lang "description.list"}}">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.min.js"></script>
+    <script src="/static/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="col-md-1 col-lg-1"></div>
+                <div class="col-md-2 col-lg-2 logo-{{.CurrentLang}} hidden-xs hidden-sm"><a href="/"><h1>{{i18n .Lang "global.title"}}</h1></a></div>
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+                    <div class="input-group input-group-lg">
+                        <input type="text" id="key" class="form-control" value="{{.Key}}">
+                        <span class="input-group-btn"><button class="btn btn-info" type="button" id="search"><i class="glyphicon glyphicon-search"></i></button></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row hots text-right hidden-xs hidden-sm">
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <span>{{range .HotList}}<a  href="/search/{{.Caption}}" title="{{.Caption}}">{{.Caption}}</a>{{end}}</span>
+                <div class="fr">
+                    <i class="fa fa-globe"></i> Language:
+                    <select class="language" autocomplete="off" onchange="changeLanguage(this.value)">
+                        {{if eq .CurrentLang "en-US"}}<option value="en-US" selected="true">English</option>{{else}}<option value="en-US">English</option>{{end}}
+                        {{if eq .CurrentLang "zh-TW"}}<option value="zh-TW" selected="true">繁體中文</option>{{else}}<option value="zh-TW">繁體中文</option>{{end}}
+                        {{if eq .CurrentLang "zh-CN"}}<option value="zh-CN" selected="true">简体中文</option>{{else}}<option value="zh-CN">简体中文</option>{{end}}
+                        {{if eq .CurrentLang "ja-JP"}}<option value="ja-JP" selected="true">日本語</option>{{else}}<option value="ja-JP">日本語</option>{{end}}
+                        {{if eq .CurrentLang "ko-KR"}}<option value="ko-KR" selected="true">한국어</option>{{else}}<option value="ko-KR">한국어</option>{{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row sort text-right">
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+                <ol class="list-inline">
+                    <span class="hidden-xs">{{i18n .Lang "global.title"}}{{i18n .Lang "search.weinin"}} <b class="highlight">{{.Key}}</b> {{i18n .Lang "search.tiao"}} <b class="blue">{{.Nums}}</b> {{i18n .Lang "search.result"}}</span>{{i18n .Lang "search.sort"}}
+                    {{if eq .Sort "puttime"}}<li class="highlight">{{i18n .Lang "search.sortupdated"}}</li>                    {{else}}<li><a href="/search/{{.Key}}/puttime">{{i18n .Lang "search.sortupdated"}}</a></li>{{end}}
+                    {{if eq .Sort "hot"}}<li class="highlight">{{i18n .Lang "search.sorthot"}}</li>{{else}}<li><a href="/search/{{.Key}}/hot">{{i18n .Lang "search.sorthot"}}</a></li>{{end}}
+                    {{if eq .Sort "length"}}<li class="highlight">{{i18n .Lang "search.sortsize"}}</li>{{else}}<li><a href="/search/{{.Key}}/length">{{i18n .Lang "search.sortsize"}}</a></li>{{end}}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+        <div class="col-xs-11 col-sm-11 col-md-7 col-lg-7">
+            <ul class="media-list media-list-set">
+                {{range .Lists}}
+                <li class="media">
+                    <div class="media-body">
+                        <h4><a class="title" href="/{{.InfoHash}}" title="{{.Caption}}">{{HightLight .Caption $.Key}}</a></h4>
+                        <div class="media-file">
+                            <ul>
+                                {{range $k, $v := .Files}}
+                                {{if lt $k 3}}
+                                <li><i class="fa {{.path | FileFormat}}"></i>{{.path}} <em>{{.length | SizeFormat}}</em></li>
+                                {{end}}
+                                {{if eq $k 3}}
+                                <li>...</li>
+                                {{end}}
+                                {{end}}
+                            </ul>
+                        </div>
+                        <div class="media-more">
+                            <span>{{i18n $.Lang "search.files"}}</span><label>{{.FileCount}}</label>
+                            <span>{{i18n $.Lang "search.size"}}</span><label>{{.Length | SizeFormat}}</label>
+                            <span>{{i18n $.Lang "search.hot"}}</span><label>{{.Hot}}</label>
+                            <div class="media-down">
+                                <a href="magnet:?xt=urn:btih:{{.InfoHash}}&dn={{.Caption}}" title="{{i18n $.Lang "search.magnetdown"}} {{.Caption}}"><i class="fa fa-magnet"></i> {{i18n $.Lang "search.magnet"}}</a>
+                                {{if $.CN}}<a href="thunder://{{.InfoHash | Thunder}}" title="迅雷下载 {{.Caption}}"><i class="fa fa-download"></i> 迅雷下载</a>{{end}}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {{end}}
+            </ul>
+            {{if .paginator}}
+            {{if gt .paginator.PageNums 1}}
+            <nav>
+                <ul class="pagination">
+                    {{if .paginator.HasPrev}}
+                    <li><a href="{{.paginator.PageLinkFirst}}" aria-label="Previous" title="{{i18n .Lang "search.prevpage"}}"><span aria-hidden="true">&laquo;</span></a></li>
+                    {{end}}
+                    {{range $index, $page := .paginator.Pages}}
+                    {{if $.paginator.IsActive .}}
+                    <li class="active"><span>{{$page}}</span></li>
+                    {{else}}
+                    <li><a href="{{$.paginator.PageLink $page}}">{{$page}}</a></li>
+                    {{end}}
+                    {{end}}
+                    {{if .paginator.HasNext}}
+                    <li><a href="{{.paginator.PageLinkNext}}" aria-label="Next" title="{{i18n .Lang "search.nextpage"}}"><span aria-hidden="true">&raquo;</span></a></li>
+                    {{end}}
+                    {{end}}
+                </ul>
+            </nav>
+            {{end}}
+        </div>
+        <div class="col-md-3 col-lg-3 hidden-xs hidden-sm sidebar">
+            <div class="widget">
+                <h3><span class="badge">HOT</span>&nbsp;&nbsp;{{i18n .Lang "search.relevant"}}</h3>
+                <ul>
+                    {{range .RelevantList}}
+                    <li><a href="/search/{{.Caption}}" title="{{.Caption}}">{{.Caption}}</a><span><i class="fa fa-clock-o"></i> {{.SearchTime | DateFormat}}</span></li>
+                    {{end}}
+                </ul>
+            </div>
+            <div class="widget">
+                <h3><span class="badge">HOT</span>&nbsp;&nbsp;{{i18n .Lang "search.lastsearch"}}</h3>
+                <ul>
+                    {{range .LastSearch}}
+                    <li><a href="/search/{{.Caption}}" title="{{.Caption}}">{{.Caption}}</a><span><i class="fa fa-clock-o"></i> {{.SearchTime | DateFormat}}</span></li>
+                    {{end}}
+                </ul>
+            </div>
+            <div class="widget">
+                <h3><span class="badge">HOT</span>&nbsp;&nbsp;{{i18n .Lang "search.random"}}</h3>
+                <ul>
+                    {{range .RandomList}}
+                    <li><a href="/search/{{.Caption}}" title="{{.Caption}}">{{.Caption}}</a><span><i class="fa fa-eye"></i> {{.Views}}</span></li>
+                    {{end}}
+                </ul>
+            </div>
+            <div class="widget">
+                <h3><span class="badge">New</span>&nbsp;&nbsp;{{i18n .Lang "search.new"}}</h3>
+                <ul>
+                    {{range .NewList}}
+                    <li><a href="/{{.InfoHash}}" title="{{.Caption}}" target="_blank">{{.Caption}}</a><span><i class="fa fa-clock-o"></i> {{.CreateTime | DateFormat}}</span></li>
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <p>Copyright &copy;2015 <a href="/">{{i18n .Lang "global.title"}}</a>. All Rights Reserved.</p>
+</footer>
+<div id="gotop"><i class="fa fa-arrow-circle-up"></i></div>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/common.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="{{.CurrentLang}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{i18n .Lang "title.home"}} - {{i18n .Lang "global.title"}}</title>
+    <meta name="keywords" content="{{i18n .Lang "keywords.home"}}">
+    <meta name="description" content="{{i18n .Lang "description.home"}}">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.min.js"></script>
+    <script src="/static/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="home">
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">{{i18n .Lang "global.title"}}</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/new"><i class="glyphicon glyphicon-fire"></i> {{i18n .Lang "menu.new"}}</a></li>
+                <li><a href="/magnet"><i class="glyphicon glyphicon-magnet"></i> {{i18n .Lang "menu.magnet"}}</a></li>
+                <li><a href="/torrent"><i class="glyphicon glyphicon-upload"></i> {{i18n .Lang "menu.torrent"}}</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-globe"></i> Language <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a onclick="javascript:changeLanguage('en-US');">English</a></li>
+                        <li><a onclick="javascript:changeLanguage('zh-TW');">繁體中文</a></li>
+                        <li><a onclick="javascript:changeLanguage('zh-CN');">简体中文</a></li>
+                        <li><a onclick="javascript:changeLanguage('ja-JP');">日本語</a></li>
+                        <li><a onclick="javascript:changeLanguage('ko-KR');">한국어</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2"></div>
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+            <div class="search">
+                <div class="home-{{.CurrentLang}} center-block"></div>
+                <div class="alert alert-warning msg text-center"><b>{{i18n .Lang "global.title"}}</b> - {{i18n .Lang "home.weindexbefore"}} <b>{{.All}}</b> {{i18n .Lang "home.weindexafter"}} {{i18n .Lang "home.todaybefore"}} <b>{{.Today}}</b> {{i18n .Lang "home.todayafter"}}</div>
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" id="key" placeholder="{{i18n .Lang "global.searchkey"}} ">
+                    <span class="input-group-btn"><button class="btn btn-info" type="submit" id="search"><i class="glyphicon glyphicon-search"></i></button></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="hot text-center  hidden-sm hidden-xs">
+                <ul class="list-inline">
+                    {{range .HotList}}
+                    <li><a href="/search/{{.Caption}}" title="{{.Caption}}" class="label label-info">{{.Caption}}</a></li>
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="home-footer">
+    <p>Copyright &copy;2015 <a href="/">{{i18n .Lang "global.title"}}</a>. All Rights Reserved.</p>
+</footer>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/common.js"></script>
+<script>
+$(function(){
+    $('#key').focus();
+});
+</script>
+</body>
+</html>

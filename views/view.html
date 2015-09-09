@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="{{.CurrentLang}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{i18n .Lang "title.viewbefore"}} {{.Caption}} {{i18n .Lang "title.viewafter"}} - {{i18n .Lang "global.title"}}</title>
+    <meta name="keywords" content="{{.Caption}} {{i18n .Lang "keywords.view"}}">
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.min.js"></script>
+    <script src="/static/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="col-md-1 col-lg-1"></div>
+                <div class="col-md-2 col-lg-2 logo-{{.CurrentLang}} hidden-xs hidden-sm"><a href="/"><h1>{{i18n .Lang "global.title"}}</h1></a></div>
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+                    <div class="input-group input-group-lg">
+                        <input type="text" id="key" class="form-control" placeholder="{{i18n .Lang "global.searchkey"}}">
+                        <span class="input-group-btn"><button class="btn btn-info" type="button" id="search"><i class="glyphicon glyphicon-search"></i></button></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row hots text-right hidden-xs hidden-sm">
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <span>{{range .HotList}}<a  href="/search/{{.Caption}}" title="{{.Caption}}">{{.Caption}}</a>{{end}}</span>
+                <div class="fr">
+                    <i class="fa fa-globe"></i> Language:
+                    <select class="language" autocomplete="off" onchange="changeLanguage(this.value)">
+                        {{if eq .CurrentLang "en-US"}}<option value="en-US" selected="true">English</option>{{else}}<option value="en-US">English</option>{{end}}
+                        {{if eq .CurrentLang "zh-TW"}}<option value="zh-TW" selected="true">繁體中文</option>{{else}}<option value="zh-TW">繁體中文</option>{{end}}
+                        {{if eq .CurrentLang "zh-CN"}}<option value="zh-CN" selected="true">简体中文</option>{{else}}<option value="zh-CN">简体中文</option>{{end}}
+                        {{if eq .CurrentLang "ja-JP"}}<option value="ja-JP" selected="true">日本語</option>{{else}}<option value="ja-JP">日本語</option>{{end}}
+                        {{if eq .CurrentLang "ko-KR"}}<option value="ko-KR" selected="true">한국어</option>{{else}}<option value="ko-KR">한국어</option>{{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid view">
+    <div class="row">
+        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 hidden-xs hidden-sm"></div>
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+            <h3>{{.Caption}}</h3>
+            <ul class="info">
+                <li><span>{{i18n .Lang "view.created"}}</span><label>{{dateformat .CreateTime "2006-01-02 15:04:05"}}</label></li>
+                <li><span>{{i18n .Lang "view.updated"}}</span><label>{{dateformat .PutTime "2006-01-02 15:04:05"}}</label></li>
+                <li><span>{{i18n .Lang "view.size"}}</span><label>{{.Length | SizeFormat}}</label></li>
+                <li>
+                    <span>{{i18n .Lang "view.related"}}</span>
+                    <label class="keywords">{{range .Keys}}<a href="/search/{{.}}" title="{{.}}">{{.}}</a>{{end}}</label>
+                </li>
+                <li><span>{{i18n .Lang "view.hot"}}</span><label>{{.Hot}}</label></li>
+                <li><span>{{i18n .Lang "view.files"}}</span><label>{{.FileCount}}</label></li>
+                <li>
+                    <span>{{i18n .Lang "view.magnet"}}</span>
+                    <label>
+                        <i class="fa fa-magnet"></i>
+                        <a href="magnet:?xt=urn:btih:{{.InfoHash}}&dn={{.Caption}}" title="{{.Caption}}">magnet:?xt=urn:btih:{{.InfoHash}}&dn={{.Caption}}</a>
+                    </label>
+                </li>
+                {{if .CN}}
+                <li>
+                    <span>迅雷下载</span>
+                    <label>
+                        <i class="fa fa-download"></i>
+                        <a href="thunder://{{.InfoHash | Thunder}}" title="{{.Caption}} - 迅雷下载">thunder://{{.InfoHash | Thunder}}</a>
+                    </label>
+                </li>
+                {{end}}
+                <li>
+                    <span>{{i18n .Lang "view.down"}}</span>
+                    <label>
+                        <i class="fa fa-cloud-download"></i>
+                        <a href="http://btcache.me/torrent/{{.InfoHash}}" title="{{.Caption}}" target="_blank">{{i18n .Lang "view.download"}}</a>
+                    </label>
+                </li>
+                {{if .Qrcode}}
+                <li>
+                    <span>{{i18n .Lang "view.qrcode"}}</span>
+                    <img height="180" width="180" alt="{{.Caption}}" src="{{.Qrcode}}">
+                </li>
+                {{end}}
+            </ul>
+            <div class="filelist">
+                <div class="tit">{{i18n .Lang "view.filelist"}}</div>
+                <ul class="fileTree treeview">
+                    {{range .FileList}}
+                    {{range .dirs}}
+                    <li class="closed">
+                        <span class="folder">{{.name}}</span>
+                        <ul>
+                            {{range .dirs}}
+                            <li class="closed">
+                                <span class="folder">{{.name}}</span>
+                                <ul>
+                                    {{range .dirs}}
+                                    <li class="closed">
+                                        <span class="folder">{{.name}}</span>
+                                        <ul>
+                                            {{range .dirs}}
+                                            <li class="closed">
+                                                <span class="folder">{{.name}}</span>
+                                                <ul>
+                                                    {{range .files}}
+                                                    <li><span><i class="fa {{.path | FileFormat}}"></i> {{.path}}<small>{{.length | SizeFormat}}</small></span></li>
+                                                    {{end}}
+                                                </ul>
+                                            {{end}}
+                                            {{range .files}}
+                                            <li><span><i class="fa {{.path | FileFormat}}"></i> {{.path}}<small>{{.length | SizeFormat}}</small></span></li>
+                                            {{end}}
+                                        </ul>
+                                    {{end}}
+                                    {{range .files}}
+                                    <li><span><i class="fa {{.path | FileFormat}}"></i> {{.path}}<small>{{.length | SizeFormat}}</small></span></li>
+                                    {{end}}
+                                </ul>
+                            {{end}}
+                            {{range .files}}
+                            <li><span><i class="fa {{.path | FileFormat}}"></i> {{.path}}<small>{{.length | SizeFormat}}</small></span></li>
+                            {{end}}
+                        </ul>
+                    {{end}}
+                    {{range .files}}
+                    <li><span><i class="fa {{.path | FileFormat}}"></i> {{.path}}<small>{{.length | SizeFormat}}</small></span></li>
+                    {{end}}
+                    {{end}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <p>Copyright &copy;2015 <a href="/">{{i18n .Lang "global.title"}}</a>. All Rights Reserved.</p>
+</footer>
+<div id="gotop"><i class="fa fa-arrow-circle-up"></i></div>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.treeview.js"></script>
+<script src="/static/js/common.js"></script>
+<script>
+$(function(){
+    $('.fileTree').treeview();
+});
+</script>
+</body>
+</html>
